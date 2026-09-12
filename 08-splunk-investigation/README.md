@@ -1,0 +1,272 @@
+# Splunk Security Investigation
+
+## Overview
+
+After generating controlled RDP authentication activity from the Kali Linux
+workstation, Splunk Enterprise was used to investigate the resulting Windows
+Security events collected from PC01.
+
+The investigation focused on identifying:
+
+- Failed authentication attempts
+- Successful authentication activity
+- The timing and frequency of failed logons
+- The workstation associated with the activity
+- The source IP address of the authentication attempts
+- Correlation between the Splunk evidence and the Kali Linux test system
+
+The investigation demonstrated how centralized Windows event telemetry can
+be used to identify and trace authentication activity within an Active
+Directory environment.
+
+---
+
+## Investigation Environment
+
+| System | Role | IP Address |
+|---|---|---|
+| Kali Linux | Authentication-testing workstation | `192.168.10.250` |
+| PC01 | Windows 11 target endpoint | `192.168.10.100` |
+| DC01 | Active Directory Domain Controller | `192.168.10.7` |
+| Splunk Server | Centralized SIEM | `192.168.10.10` |
+
+The domain account used during the controlled test was:
+
+`ahamilton@cameronlab.local`
+
+---
+
+# 1. Failed Authentication Detection — Event ID 4625
+
+The first stage of the investigation focused on failed authentication
+activity.
+
+The following Splunk search was used:
+
+```spl
+index=endpoint ahamilton EventCode=4625
+```
+
+The query returned **51 matching Event ID 4625 events** during the selected
+investigation window.
+
+![Event ID 4625 Failed Logons](../assets/screenshots/08-investigation/01-event-4625-failed-logons.jpg)
+
+Windows Security Event ID `4625` represents a failed account logon.
+
+Reference:
+
+[Windows Security Event ID 4625 — An account failed to log on](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4625)
+
+The presence of repeated 4625 events confirmed that Windows recorded the
+failed authentication attempts generated during the controlled Hydra test.
+
+---
+
+# 2. Authentication Timing Analysis
+
+Individual Event ID 4625 records were then reviewed using Splunk's event
+timeline.
+
+The events appeared within a highly compressed period, with multiple failed
+authentication attempts occurring only seconds apart.
+
+![Failed Logon Timeline](../assets/screenshots/08-investigation/02-failed-logon-timeline.jpg)
+
+This timing pattern was consistent with the automated password-guessing
+activity generated from Hydra rather than normal interactive user behavior.
+
+The investigation therefore established the following relationship:
+
+```text
+Hydra password attempts
+        ↓
+Repeated RDP authentication requests
+        ↓
+Windows authentication failures
+        ↓
+Event ID 4625
+        ↓
+Splunk
+```
+
+The event timeline was particularly useful because the frequency of the
+authentication failures provided additional context beyond simply identifying
+individual failed logons.
+
+---
+
+# 3. Successful Authentication Detection — Event ID 4624
+
+The investigation also searched for successful authentication activity
+associated with the tested account.
+
+The following Splunk search was used:
+
+```spl
+index=endpoint ahamilton EventCode=4624
+```
+
+The query returned **17 matching Event ID 4624 events** within the selected
+search window.
+
+![Event ID 4624 Successful Logons](../assets/screenshots/08-investigation/03-event-4624-successful-logons.jpg)
+
+Windows Security Event ID `4624` represents a successful account logon.
+
+Reference:
+
+[Windows Security Event ID 4624 — An account was successfully logged on](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4624)
+
+These results confirmed that successful authentication activity for the
+account was also visible within the centralized Windows Security logs.
+
+> **Note:** The 17 matching events represent all Event ID 4624 records returned
+> by the Splunk query during the selected time window. They should not be
+> interpreted as 17 separate successful Hydra password discoveries.
+
+---
+
+# 4. Authentication Source Identification
+
+After identifying the authentication events, the event details were examined
+to determine where the activity originated.
+
+Splunk exposed network metadata contained within the Windows Security event,
+including the source workstation and source network address.
+
+The event showed:
+
+| Field | Observed Value |
+|---|---|
+| Workstation Name | `kali` |
+| Source Network Address | `192.168.10.250` |
+
+![Authentication Source Identification](../assets/screenshots/08-investigation/04-authentication-source-identification.jpg)
+
+The source IP address matched the statically assigned IP address of the Kali
+Linux workstation used during the controlled authentication test:
+
+`192.168.10.250`
+
+This allowed the activity observed in Splunk to be correlated directly with
+the system that generated the authentication traffic.
+
+---
+
+# 5. Event Correlation
+
+The investigation combined information from multiple stages of the lab.
+
+```text
+Kali Linux
+192.168.10.250
+        │
+        │ Hydra RDP authentication attempts
+        ▼
+PC01
+192.168.10.100
+        │
+        │ Windows Security logging
+        ▼
+Event ID 4625
+Failed Authentication
+
+Event ID 4624
+Successful Authentication
+        │
+        │ Splunk Universal Forwarder
+        ▼
+Splunk Enterprise
+192.168.10.10
+        │
+        ▼
+Security Investigation
+```
+
+The evidence could be correlated across the environment:
+
+| Evidence | Observation |
+|---|---|
+| Kali configuration | Testing workstation assigned `192.168.10.250` |
+| Hydra test | RDP authentication attempts generated against PC01 |
+| Event ID 4625 | Repeated failed logons recorded |
+| Event timing | Multiple attempts occurred within seconds |
+| Event ID 4624 | Successful authentication events were also present |
+| Workstation field | Source identified as `kali` |
+| Source Network Address | Source identified as `192.168.10.250` |
+
+Together, these data points established a clear relationship between the
+controlled security test and the authentication telemetry observed in Splunk.
+
+---
+
+# 6. Investigation Findings
+
+The Splunk investigation demonstrated that the centralized logging
+environment could provide visibility into Windows authentication activity.
+
+### Key findings
+
+- Splunk successfully ingested Windows Security authentication events from PC01.
+- Event ID `4625` exposed repeated failed authentication attempts.
+- The failed logons occurred within a short time period consistent with the
+  automated Hydra test.
+- Event ID `4624` provided visibility into successful authentication activity.
+- Windows event metadata exposed the originating workstation name as `kali`.
+- The source network address was identified as `192.168.10.250`.
+- The observed source address matched the Kali Linux workstation configured
+  earlier in the lab.
+- Splunk provided a centralized location for correlating authentication
+  events, timestamps, host information, and network metadata.
+
+---
+
+# 7. Skills Demonstrated
+
+This investigation provided hands-on experience with:
+
+- Splunk Search Processing Language (SPL)
+- Windows Security Event Log analysis
+- Event ID 4624 analysis
+- Event ID 4625 analysis
+- Authentication-event investigation
+- Failed-login pattern recognition
+- Source IP identification
+- Workstation attribution
+- Event timeline analysis
+- SIEM-based event correlation
+- Active Directory authentication monitoring
+- Security telemetry analysis
+
+---
+
+## Result
+
+The investigation successfully traced authentication activity generated from
+the Kali Linux workstation through the Windows logging pipeline and into
+Splunk Enterprise.
+
+Rather than only confirming that logs were being collected, the investigation
+demonstrated how centralized SIEM telemetry could be used to answer practical
+security questions:
+
+**What happened?**  
+Repeated failed and successful authentication activity occurred against a
+domain account.
+
+**When did it happen?**  
+Splunk timestamps showed multiple failed attempts occurring within seconds of
+one another.
+
+**Where did it originate?**  
+The authentication events identified the workstation as `kali` and the source
+network address as `192.168.10.250`.
+
+**Can the activity be correlated with the test environment?**  
+Yes. The source IP matched the statically configured Kali Linux workstation
+used to generate the controlled Hydra authentication activity.
+
+This completed the end-to-end security-monitoring workflow:
+
+**Generate Activity → Collect Logs → Centralize Telemetry → Search Events → Analyze Behavior → Identify Source**
