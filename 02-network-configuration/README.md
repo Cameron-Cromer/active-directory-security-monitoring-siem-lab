@@ -12,7 +12,7 @@ following address space:
 
 All virtual machines were connected to the CameronLab NAT network.
 
-![VM Network Adapter](../assets/screenshots/02-networking/vm-nat-adapter.jpg)
+![VM Network Adapter](../assets/screenshots/02-networking/02-vm-nat-network-adapter.jpg)
 
 ## Static IP Addressing
 
