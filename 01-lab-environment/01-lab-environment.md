@@ -18,7 +18,7 @@ different systems within the environment.
 All four systems were deployed in Oracle VirtualBox and connected
 through the same virtual NAT network.
 
-![VirtualBox Environment](assets/screenshots/01-environment/virtualbox-lab-vms.jpg)
+![VirtualBox Environment](assets/screenshots/01-environment/01-virtualbox-vm-overview.jpg)
 
 This architecture allowed Windows administration, endpoint monitoring,
 centralized log collection, and controlled security testing to be
