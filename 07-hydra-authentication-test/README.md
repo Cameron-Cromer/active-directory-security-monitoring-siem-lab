@@ -57,7 +57,7 @@ directory.
 ![Hydra Wordlist Setup](../assets/screenshots/07-hydra-testing/01-hydra-wordlist-setup.jpg)
 
 The wordlist contained multiple candidate passwords, including the password
-assigned to the test domain account.
+assigned to the test domain account (<font color="red"><strong>Camlab1!</strong></font>).
 
 ![Hydra Test Wordlist](../assets/screenshots/07-hydra-testing/02-hydra-test-wordlist.jpg)
 
