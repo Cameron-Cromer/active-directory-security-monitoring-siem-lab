@@ -53,6 +53,8 @@ driver were running on the Windows system.
 
 ![Sysmon Installation Success](../assets/screenshots/04-telemetry/05-sysmon-installation-success.jpg)
 
+[View sysmonconfig](../configs/sysmon/sysmonconfig.txt)
+
 ---
 
 ## Splunk Input Configuration
