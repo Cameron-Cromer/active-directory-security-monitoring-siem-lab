@@ -1,4 +1,7 @@
 # Active Directory Security Monitoring & SIEM Lab
+## Lab Architecture
+
+![Lab Architecture](assets/diagrams/lab-architecture.jpg)
 
 ## Overview
 
@@ -50,10 +53,6 @@ The primary objectives of this project were to:
 - Correlate security-testing activity with centralized SIEM telemetry
 
 ---
-
-## Lab Architecture
-
-![Lab Architecture](assets/diagrams/lab-architecture.jpg)
 
 ### Network Details
 
