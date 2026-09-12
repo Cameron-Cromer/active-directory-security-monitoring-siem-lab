@@ -125,6 +125,20 @@ The most relevant authentication events included:
 | `4625` | Failed account logon |
 | `4624` | Successful account logon |
 
+### Windows Security Event ID References
+
+The Windows Security Event IDs observed during the authentication test can be
+cross-referenced with the Ultimate Windows Security Encyclopedia:
+
+- **Event ID 4624 — An account was successfully logged on**  
+  [View Event ID 4624 Reference](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4624)
+
+- **Event ID 4625 — An account failed to log on**  
+  [View Event ID 4625 Reference](https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventid=4625)
+
+These references confirm the meaning of the authentication event IDs later
+observed during the Splunk investigation.
+
 Because PC01 was already configured with the Splunk Universal Forwarder,
 these authentication events were sent to the centralized Splunk Enterprise
 server for analysis.
