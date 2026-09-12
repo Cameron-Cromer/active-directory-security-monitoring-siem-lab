@@ -159,7 +159,7 @@ The actual configuration files used in the lab are included in the repository:
 
 - [`inputs.conf`](configs/splunk/inputs.conf) — defines the Windows and Sysmon event sources collected by the Splunk Universal Forwarder
 - [`outputs.conf`](configs/splunk/outputs.conf) — defines the Splunk Enterprise receiver at `192.168.10.10:9997`
-- [`sysmonconfig.xml`](configs/sysmon/sysmonconfig.xml) — defines the Sysmon monitoring configuration used on the Windows endpoint
+- [`sysmonconfig.txt`](configs/sysmon/sysmonconfig.txt) — defines the Sysmon monitoring configuration used on the Windows endpoint
 
 ➡️ **[View Endpoint Telemetry Documentation](04-endpoint-telemetry/)**
 
